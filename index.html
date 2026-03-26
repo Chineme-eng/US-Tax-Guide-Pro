@@ -1,1 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaxMap Pro — US State Tax Guide 2025</title>
+  <link rel="icon" type="image/png" href="KP.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f0e8;
+      --bg-card: #fdfaf4;
+      --ink: #1a1208;
+      --ink-muted: #5a4f3a;
+      --ink-faint: #a89880;
+      --accent: #c8402a;
+      --accent-light: #f2ded9;
+      --accent2: #2a6e4a;
+      --accent2-light: #d6ede1;
+      --gold: #b8862a;
+      --gold-light: #f5e8c8;
+      --border: #d4c8b0;
+      --border-strong: #a89a7a;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --serif: 'Playfair Display', Georgia, serif;
+      --radius: 2px;
+      --shadow: 0 2px 12px rgba(26,18,8,0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 400; line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
 
+    .noise { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E"); background-size: 200px; }
+
+    /* Header */
+    header { background: var(--ink); color: var(--bg); border-bottom: 4px solid var(--accent); }
+    .header-inner { max-width: 1100px; margin: 0 auto; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .logo { display: flex; align-items: center; gap: 1rem; }
+    .logo-icon { font-family: var(--mono); font-size: 2rem; font-weight: 500; color: var(--accent); background: rgba(200,64,42,0.15); width: 2.8rem; height: 2.8rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(200,64,42,0.3); border-radius: var(--radius); flex-shrink: 0; }
+    .logo h1 { font-family: var(--serif); font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1; color: #fff; }
+    .logo p { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-top: 2px; }
+    .header-note { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.06em; text-align: right; }
+    .header-tools { display:flex; align-items:stretch; gap:.8rem; flex-wrap:wrap; justify-content:flex-end; }
+    .header-actions { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; justify-content:flex-end; }
+    .header-panel { min-width: 235px; padding: .8rem .95rem; border:1px solid rgba(255,255,255,0.12); background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border-radius: var(--radius); }
+    .header-panel-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:.7rem; margin-top:.55rem; }
+    .header-metric strong { display:block; font-family:var(--mono); font-size:.92rem; color:#fff; line-height:1.1; }
+    .header-metric span { display:block; font-family:var(--mono); font-size:.58rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; margin-top:.18rem; }
+
+    /* Main */
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+    /* Hero */
+    .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .hero-text h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 0.6rem; }
+    .hero-text h2 em { font-style: italic; color: var(--accent); }
+    .hero-text { flex: 1 1 560px; }
+    .hero-text p { font-size: 1rem; color: var(--ink-muted); max-width: 560px; line-height: 1.7; }
+
+    /* Controls */
+    .controls { display: flex; flex-direction: column; gap: 1rem; min-width: 300px; max-width: 360px; width: 100%; }
+    .selector-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+    .selector-wrap label, .filing-wrap label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); }
+    .select-outer { position: relative; }
+    .select-outer select { width: 100%; padding: 0.85rem 3rem 0.85rem 1.1rem; font-family: var(--sans); font-size: 1rem; font-weight: 500; color: var(--ink); background: var(--bg-card); border: 2px solid var(--border-strong); border-radius: var(--radius); appearance: none; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+    .select-outer select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    .select-outer select:hover { border-color: var(--ink-muted); }
+    .select-arrow { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); font-size: 1rem; color: var(--accent); pointer-events: none; font-family: var(--mono); }
+
+    /* Filing status toggle */
+    .filing-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+    .filing-toggle { display: flex; gap: 0; border: 2px solid var(--border-strong); border-radius: var(--radius); overflow: hidden; }
+    .filing-toggle button { flex: 1; padding: 0.6rem 0.5rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; background: var(--bg-card); color: var(--ink-muted); border: none; cursor: pointer; transition: background 0.15s, color 0.15s; border-right: 1px solid var(--border-strong); }
+    .filing-toggle button:last-child { border-right: none; }
+    .filing-toggle button.active { background: var(--ink); color: #fff; }
+    .local-tax-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+    .local-tax-note { font-size: 0.72rem; color: var(--ink-faint); line-height: 1.5; }
+
+    /* State header */
+    .state-header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+    .state-title-block { display: flex; align-items: center; gap: 1rem; }
+    .state-emoji { font-size: 2.5rem; line-height: 1; }
+    .state-title-block h3 { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+    .state-title-block p { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-muted); margin-top: 3px; letter-spacing: 0.05em; }
+    .quick-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .quick-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 1rem; text-align: center; min-width: 90px; }
+    .quick-stat-value { font-family: var(--mono); font-size: 1.2rem; font-weight: 500; color: var(--accent); line-height: 1; }
+    .quick-stat-label { font-size: 0.68rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); animation: fadeUp 0.4s ease both; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .card--income::before { background: var(--accent); }
+    .card--examples::before { background: var(--gold); }
+    .card--other::before { background: var(--accent2); }
+    .card--quirks::before { background: var(--ink-muted); }
+    .card:nth-child(2) { animation-delay: 0.07s; }
+    .card:nth-child(3) { animation-delay: 0.14s; }
+    .card:nth-child(4) { animation-delay: 0.21s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .card-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.65rem; }
+
+    /* Income tax */
+    .tax-type-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-family: var(--mono); font-size: 0.75rem; font-weight: 500; margin-bottom: 1rem; letter-spacing: 0.04em; }
+    .badge--none { background: var(--accent2-light); color: var(--accent2); }
+    .badge--flat { background: var(--gold-light); color: var(--gold); }
+    .badge--brackets { background: var(--accent-light); color: var(--accent); }
+    .brackets-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-top: 0.5rem; }
+    .brackets-table th { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); }
+    .brackets-table td { padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--border); color: var(--ink-muted); font-family: var(--mono); font-size: 0.82rem; }
+    .brackets-table tr:last-child td { border-bottom: none; }
+    .brackets-table td:last-child { color: var(--accent); font-weight: 500; text-align: right; }
+    .flat-rate { font-family: var(--mono); font-size: 2.5rem; font-weight: 500; color: var(--gold); line-height: 1; margin-bottom: 0.25rem; }
+    .flat-desc { font-size: 0.85rem; color: var(--ink-muted); }
+    .no-tax-message { font-family: var(--serif); font-size: 1.1rem; color: var(--accent2); font-style: italic; line-height: 1.5; }
+
+    /* Examples */
+    .example-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 0; border-bottom: 1px dashed var(--border); }
+    .example-row:last-child { border-bottom: none; }
+    .example-income { font-family: var(--mono); font-size: 0.85rem; color: var(--ink-muted); width: 80px; flex-shrink: 0; }
+    .example-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .example-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent2)); border-radius: 999px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+    .example-takehome { font-family: var(--mono); font-size: 0.9rem; font-weight: 500; color: var(--ink); width: 90px; text-align: right; flex-shrink: 0; }
+    .example-pct { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); width: 40px; text-align: right; flex-shrink: 0; }
+    .example-note { font-size: 0.72rem; color: var(--ink-faint); margin-top: 0.75rem; font-style: italic; }
+
+    /* Tax rows */
+    .tax-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.85rem 0; border-bottom: 1px solid var(--border); gap: 1rem; }
+    .tax-row:last-child { border-bottom: none; }
+    .tax-row-label { font-size: 0.875rem; color: var(--ink-muted); flex: 1; }
+    .tax-row-label strong { display: block; color: var(--ink); font-weight: 500; margin-bottom: 2px; }
+    .tax-row-value { font-family: var(--mono); font-size: 1.1rem; font-weight: 500; color: var(--accent2); white-space: nowrap; }
+
+    /* Quirks */
+    .quirk-item { display: flex; gap: 0.75rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .quirk-item:last-child { border-bottom: none; }
+    .quirk-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .quirk-text { font-size: 0.875rem; color: var(--ink-muted); line-height: 1.55; }
+
+    /* Compare banner */
+    .compare-banner { background: var(--gold-light); border: 1px solid var(--gold); border-radius: var(--radius); padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.3s ease both; }
+    .compare-banner p { font-size: 0.85rem; color: var(--ink-muted); }
+    .compare-banner strong { color: var(--ink); }
+    .compare-btn { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; padding: 0.4rem 0.85rem; background: var(--ink); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+    .compare-btn:hover { opacity: 0.8; }
+    .compare-btn.secondary { background: transparent; color: var(--ink-muted); border: 1px solid var(--border-strong); }
+
+    /* Compare modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(26,18,8,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); max-width: 860px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(26,18,8,0.2); }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
+    .modal-header h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; }
+    .modal-close { font-family: var(--mono); font-size: 1.2rem; background: none; border: none; cursor: pointer; color: var(--ink-muted); padding: 0.25rem 0.5rem; }
+    .modal-body { padding: 1.5rem; }
+    .compare-select-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .compare-select-row .select-outer { flex: 1; min-width: 200px; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .compare-table th { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); text-align: left; padding: 0.6rem 0.75rem; border-bottom: 2px solid var(--border); }
+    .compare-table th:not(:first-child) { text-align: center; }
+    .compare-table td { padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--ink-muted); vertical-align: top; }
+    .compare-table td:not(:first-child) { text-align: center; font-family: var(--mono); font-size: 0.85rem; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child { font-size: 0.82rem; color: var(--ink); font-weight: 500; }
+    .compare-winner { color: var(--accent2); font-weight: 700; }
+    .compare-loser { color: var(--accent); }
+
+    /* Placeholder */
+    .placeholder { display: flex; align-items: center; justify-content: center; min-height: 320px; }
+    .placeholder-inner { text-align: center; color: var(--ink-faint); }
+    .placeholder-inner span { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+    .placeholder-inner p { font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.06em; }
+
+    /* Footer */
+    footer { background: var(--ink); color: var(--ink-faint); padding: 2rem; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; line-height: 1.9; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 2rem; justify-content: space-between; flex-wrap: wrap; }
+    .footer-col h4 { color: #fff; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .footer-col p, .footer-col a { color: var(--ink-faint); font-size: 0.68rem; text-decoration: none; display: block; line-height: 1.8; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom { max-width: 1100px; margin: 1.25rem auto 0; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.65rem; color: rgba(168,152,128,0.6); }
+
+    .hidden { display: none !important; }
+
+    .header-btn { border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.04); color:#fff; border-radius:999px; padding:0.6rem 0.9rem; font-family:var(--mono); font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:transform .15s, background .15s; }
+    .header-btn:hover { transform:translateY(-1px); background:rgba(255,255,255,0.08); }
+    .header-btn--accent { background:var(--accent); border-color:var(--accent); }
+    .planner-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:1.25rem; margin:0 0 1.6rem; }
+    .planner-card, .snapshot-card, .pro-score-card, .leaderboard-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .planner-card::before, .snapshot-card::before, .pro-score-card::before, .leaderboard-card::before { content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--accent); }
+    .snapshot-card::before { background:var(--gold); }
+    .leaderboard-card::before { background:var(--accent2); }
+    .planner-top, .mini-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .planner-top h3, .mini-top h3 { font-family:var(--serif); font-size:1.35rem; line-height:1.1; letter-spacing:-0.02em; }
+    .planner-top p, .mini-top p { font-size:0.9rem; color:var(--ink-muted); max-width:48ch; }
+    .pill { display:inline-flex; align-items:center; padding:0.35rem 0.7rem; border-radius:999px; font-family:var(--mono); font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; border:1px solid var(--border); background:var(--gold-light); color:var(--gold); }
+    .planner-fields { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:0.95rem 1rem; margin-top:0.8rem; }
+    .planner-field { display:flex; flex-direction:column; gap:0.4rem; }
+    .planner-field label { font-family:var(--mono); font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-muted); }
+    .planner-input { width:100%; padding:0.85rem 1rem; font-family:var(--sans); font-size:1rem; color:var(--ink); background:var(--bg-card); border:2px solid var(--border-strong); border-radius:var(--radius); }
+    .planner-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-light); }
+    .planner-help { font-size:0.75rem; color:var(--ink-faint); }
+    .planner-actions { display:flex; gap:0.7rem; flex-wrap:wrap; margin-top:1rem; }
+    .planner-btn { display:inline-flex; align-items:center; justify-content:center; gap:0.45rem; padding:0.85rem 1.05rem; border-radius:999px; border:1px solid var(--border-strong); background:transparent; color:var(--ink); font-family:var(--mono); font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:transform .15s, background .15s; }
+    .planner-btn:hover { transform:translateY(-1px); background:#f2ece1; }
+    .planner-btn--accent { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .planner-btn--accent:hover { background:var(--accent2); border-color:var(--accent2); }
+    .snapshot-grid { display:grid; gap:0.75rem; }
+    .snapshot-row { display:flex; justify-content:space-between; gap:1rem; align-items:flex-start; padding:0.8rem 0; border-bottom:1px solid var(--border); }
+    .snapshot-row:last-child { border-bottom:none; }
+    .snapshot-row span { font-size:0.82rem; color:var(--ink-muted); }
+    .snapshot-row strong { font-family:var(--mono); font-size:0.92rem; color:var(--ink); text-align:right; }
+    .snapshot-note { margin-top:0.8rem; font-size:0.75rem; color:var(--ink-faint); }
+    .pro-score-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:1rem; }
+    .big-takehome { font-family:var(--mono); font-size:2.6rem; line-height:1; color:var(--accent); margin-bottom:0.35rem; }
+    .pro-sub { color:var(--ink-muted); font-size:0.9rem; }
+    .metric-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:0.8rem; margin-top:1rem; }
+    .metric { border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbf7ee); padding:0.8rem; }
+    .metric strong { display:block; font-family:var(--mono); font-size:1rem; color:var(--ink); margin-bottom:0.1rem; }
+    .metric span { font-size:0.72rem; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.08em; }
+    .leaderboard-list { display:grid; gap:0.7rem; }
+    .leaderboard-row { display:grid; grid-template-columns:auto 1fr auto; gap:0.7rem; align-items:center; padding:0.75rem; border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbf7ee); }
+    .leaderboard-rank { width:1.8rem; height:1.8rem; display:flex; align-items:center; justify-content:center; background:var(--ink); color:#fff; font-family:var(--mono); font-size:0.76rem; }
+    .leaderboard-row b { display:block; font-size:0.9rem; color:var(--ink); }
+    .leaderboard-row small { display:block; font-size:0.74rem; color:var(--ink-faint); }
+    .leaderboard-row strong { font-family:var(--mono); font-size:0.82rem; color:var(--accent2); }
+
+
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .controls { width: 100%; max-width: none; }
+      .state-header { flex-direction: column; align-items: flex-start; }
+      .header-tools, .header-actions { width:100%; justify-content:flex-start; }
+      .header-panel { width:100%; min-width:0; }
+      .header-note { display: none; }
+      .compare-select-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">$</span>
+      <div>
+        <h1>TaxMap Pro</h1>
+        <p>Premium State Tax Intelligence</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <div class="header-panel">
+        <div class="header-note">2025 Tax Year · Pro Planner Build</div>
+        <div class="header-panel-grid">
+          <div class="header-metric"><strong>50</strong><span>States</span></div>
+          <div class="header-metric"><strong>3</strong><span>Pro tools</span></div>
+          <div class="header-metric"><strong>1</strong><span>Export file</span></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" id="saveScenarioBtn">Save Scenario</button>
+        <button class="header-btn header-btn--accent" id="exportReportBtn">Export Report</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-text">
+      <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:.9rem"><span class="pill">Premium positioning</span><span class="pill">Personal tax planner</span><span class="pill">Move-vs-stay insights</span></div><h2>Know what you <em>actually</em> keep.</h2>
+      <p>Select your state to see income tax brackets, real take-home pay examples, sales tax, property tax, and notable tax facts — plus a personalized planner, move comparison, best-state ranking, and exportable scenario snapshot.</p>
+    </div>
+    <div class="controls">
+      <div class="selector-wrap">
+        <label for="stateSelect">Choose your state</label>
+        <div class="select-outer">
+          <select id="stateSelect"><option value="">— Select a State —</option></select>
+          <span class="select-arrow">↓</span>
+        </div>
+      </div>
+      <div class="filing-wrap">
+        <label>Filing status</label>
+        <div class="filing-toggle">
+          <button class="active" data-status="single">Single</button>
+          <button data-status="mfj">Married Filing Jointly</button>
+          <button data-status="hoh">Head of Household</button>
+        </div>
+      </div>
+      <div class="local-tax-wrap hidden" id="localTaxWrap">
+        <label for="localTaxSelect">City / local income tax</label>
+        <div class="select-outer">
+          <select id="localTaxSelect"></select>
+          <span class="select-arrow">↓</span>
+        </div>
+        <p class="local-tax-note" id="localTaxNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="planner-grid">
+    <div class="planner-card">
+      <div class="planner-top">
+        <div>
+          <h3>Personal Tax Planner</h3>
+          <p>This is the biggest upgrade for the paid version: users can model their own income, spending, home value, and a move target instead of just reading a state reference page.</p>
+        </div>
+        <span class="pill">Pro calculator</span>
+      </div>
+      <div class="planner-fields">
+        <div class="planner-field">
+          <label for="incomeInput">Annual gross income</label>
+          <input id="incomeInput" class="planner-input" type="number" min="0" step="1000" value="85000">
+          <span class="planner-help">Used for personalized take-home, burden, and rankings.</span>
+        </div>
+        <div class="planner-field">
+          <label for="monthlySpendInput">Monthly taxable spending</label>
+          <input id="monthlySpendInput" class="planner-input" type="number" min="0" step="50" value="1800">
+          <span class="planner-help">Estimates annual sales-tax drag.</span>
+        </div>
+        <div class="planner-field">
+          <label for="homeValueInput">Home value</label>
+          <input id="homeValueInput" class="planner-input" type="number" min="0" step="5000" value="450000">
+          <span class="planner-help">Estimates annual property tax cost.</span>
+        </div>
+        <div class="planner-field">
+          <label for="compareMoveSelect">Compare against another state</label>
+          <div class="select-outer">
+            <select id="compareMoveSelect"><option value="">— Optional move comparison —</option></select>
+            <span class="select-arrow">↓</span>
+          </div>
+          <span class="planner-help">Creates a move-vs-stay savings insight.</span>
+        </div>
+      </div>
+      <div class="planner-actions">
+        <button class="planner-btn planner-btn--accent" id="recalcBtn">Recalculate</button>
+        <button class="planner-btn" id="resetScenarioBtn">Reset Defaults</button>
+      </div>
+    </div>
+    <aside class="snapshot-card">
+      <div class="mini-top">
+        <div>
+          <h3>Scenario Snapshot</h3>
+          <p>A premium-feeling summary users can save and export.</p>
+        </div>
+      </div>
+      <div class="snapshot-grid" id="snapshotGrid">
+        <div class="snapshot-row"><span>Selected state</span><strong>—</strong></div>
+        <div class="snapshot-row"><span>Estimated annual take-home</span><strong>—</strong></div>
+        <div class="snapshot-row"><span>Move-vs-stay difference</span><strong>—</strong></div>
+        <div class="snapshot-row"><span>Estimated annual tax drag</span><strong>—</strong></div>
+      </div>
+      <p class="snapshot-note" id="saveStatus">Nothing saved yet. Use <b>Save Scenario</b> after selecting a state.</p>
+    </aside>
+  </section>
+
+  <div id="taxContent" class="hidden">
+    <div id="compareBanner" class="compare-banner hidden">
+      <p>Comparing <strong id="compareStateA"></strong> vs <strong id="compareStateB"></strong></p>
+      <div style="display:flex;gap:0.5rem">
+        <button class="compare-btn secondary" id="clearCompare">Clear</button>
+        <button class="compare-btn" id="viewCompareFull">Edit Comparison</button>
+      </div>
+    </div>
+
+    <div class="state-header">
+      <div class="state-title-block">
+        <span class="state-emoji" id="stateEmoji"></span>
+        <div>
+          <h3 id="stateName"></h3>
+          <p id="stateTagline"></p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <div class="quick-stats" id="quickStats"></div>
+        <button class="compare-btn secondary" id="addCompareBtn" style="font-size:0.68rem">⇄ Compare States</button>
+      </div>
+    </div>
+
+    <section class="pro-score-grid">
+      <div class="pro-score-card">
+        <div class="mini-top">
+          <div>
+            <h3>Personalized Outlook</h3>
+            <p id="headlineSub">Select a state to see your annual take-home estimate.</p>
+          </div>
+          <span class="pill">Pro insight</span>
+        </div>
+        <div class="big-takehome" id="headlineTakehome">$0</div>
+        <div class="metric-grid" id="metricGrid"></div>
+      </div>
+      <aside class="leaderboard-card">
+        <div class="mini-top">
+          <div>
+            <h3>Best-State Leaderboard</h3>
+            <p>Top states by take-home at your current income.</p>
+          </div>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+      </aside>
+    </section>
+
+    <div class="grid">
+      <div class="card card--income"><div class="card-label">Income Tax</div><div id="incomeTaxContent"></div></div>
+      <div class="card card--examples"><div class="card-label">Take-Home Pay Examples</div><div id="examplesContent"></div></div>
+      <div class="card card--other"><div class="card-label">Sales &amp; Property Tax</div><div id="otherTaxContent"></div></div>
+      <div class="card card--quirks"><div class="card-label">Notable Tax Facts</div><div id="quirksContent"></div></div>
+    </div>
+  </div>
+
+  <div id="placeholder" class="placeholder">
+    <div class="placeholder-inner">
+      <span>🗺️</span>
+      <p>Select a state above to explore its tax landscape</p>
+    </div>
+  </div>
+</main>
+
+<!-- Compare Modal -->
+<div id="compareModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Side-by-Side Comparison</h3>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="compare-select-row">
+        <div class="select-outer">
+          <select id="compareSelectA"></select>
+          <span class="select-arrow">↓</span>
+        </div>
+        <div class="select-outer">
+          <select id="compareSelectB"></select>
+          <span class="select-arrow">↓</span>
+        </div>
+      </div>
+      <div id="compareMsg" class="hidden" style="font-family:var(--mono);font-size:0.75rem;color:var(--accent);margin-bottom:1rem;padding:0.5rem 0.75rem;background:var(--accent-light);border-radius:var(--radius)"></div>
+      <div id="compareTableWrap"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4>TaxMap</h4>
+      <p>A premium state tax planning tool.</p>
+      <p>Personalized scenarios. Saveable snapshots. Exportable reports.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Data Sources</h4>
+      <a href="https://taxfoundation.org" target="_blank">Tax Foundation</a>
+      <a href="https://irs.gov" target="_blank">Internal Revenue Service (IRS)</a>
+      <p>State revenue department websites</p>
+    </div>
+    <div class="footer-col">
+      <h4>Methodology</h4>
+      <p>Take-home estimates: federal tax + FICA (7.65%) + state tax.</p>
+      <p>Standard deduction applied. Single filer by default.</p>
+      <p>Optional city / local income taxes included when selected.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Disclaimer</h4>
+      <p>For informational purposes only.</p>
+      <p>Not tax, legal, or financial advice.</p>
+      <p>Consult a licensed tax professional for your specific situation.</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    TaxMap Pro · 2025 Tax Year · Premium scenario planner build · Rates are approximate and may not reflect all local surtaxes, phaseouts, or credits.
+  </div>
+</footer>
+
+<script>
+// ── 2025 Tax Data ─────────────────────────────────────────────
+// Key 2025 updates vs 2024:
+// - Federal: new brackets, standard deduction $15,750 (single), $31,500 (MFJ)
+// - AR: 4.4% top rate | AZ: 2.5% flat | GA: 5.19% flat | ID: 5.3% flat
+// - IN: 3.0% flat | IA: 3.8% flat | LA: 3.0% flat | MS: 4.4% flat
+// - MO: 4.7% top rate | NE: 5.2% top rate | NC: 4.25% flat
+// - NH: NO income tax (interest/dividends tax repealed)
+// - NM: updated brackets | SC: 6.2% | UT: 4.5% | WV: 4.82% top rate
+// - LA: sales tax back to 5% | MO: no capital gains tax
+
+const TAX_DATA = {
+  AL: { name:"Alabama", emoji:"🌿", tagline:"The Heart of Dixie", incomeTax:{type:"brackets",brackets:[{min:0,max:500,rate:2},{min:500,max:3000,rate:4},{min:3000,max:null,rate:5}]}, salesTax:{state:4.0,avgLocal:5.24,combined:9.24}, propertyTax:{effective:0.41,note:"One of the lowest in the US"}, quirks:[{icon:"🏠",text:"Property tax is among the lowest in the nation — great for homeowners."},{icon:"🛒",text:"Combined sales tax can exceed 10% in some municipalities."},{icon:"👴",text:"Social Security income is not taxed at the state level."}]},
+  AK: { name:"Alaska", emoji:"🐻", tagline:"The Last Frontier", incomeTax:{type:"none"}, salesTax:{state:0,avgLocal:1.82,combined:1.82}, propertyTax:{effective:1.04,note:"Varies widely; no statewide sales tax"}, quirks:[{icon:"💰",text:"No state income tax AND no statewide sales tax — a true tax haven."},{icon:"🎁",text:"Residents may receive an annual Permanent Fund Dividend (PFD) — a share of oil revenues."},{icon:"🌊",text:"Local governments may levy their own sales taxes up to ~7.5%."}]},
+  AZ: { name:"Arizona", emoji:"🌵", tagline:"The Grand Canyon State", incomeTax:{type:"flat",rate:2.5,note:"Flat 2.5% rate — one of the lowest in the US"}, salesTax:{state:5.6,avgLocal:2.77,combined:8.37}, propertyTax:{effective:0.51,note:"Below national average"}, quirks:[{icon:"📉",text:"Flat 2.5% income tax — one of the lowest flat rates in the entire country."},{icon:"🛍️",text:"Food purchased at grocery stores is generally exempt from state sales tax."},{icon:"☀️",text:"No tax on Social Security benefits."}]},
+  AR: { name:"Arkansas", emoji:"🦆", tagline:"The Natural State", incomeTax:{type:"brackets",brackets:[{min:0,max:4400,rate:0},{min:4400,max:8800,rate:4.0},{min:8800,max:null,rate:4.4}]}, salesTax:{state:6.5,avgLocal:2.93,combined:9.43}, propertyTax:{effective:0.63,note:"Moderate rates"}, quirks:[{icon:"📉",text:"Top income tax rate cut to 4.4% in 2025, down from 4.7% — one of the most aggressive reductions in the country."},{icon:"🛒",text:"Groceries are taxed at a reduced state rate of 0.125%."},{icon:"💊",text:"Prescription drugs are exempt from sales tax."}]},
+  CA: { name:"California", emoji:"🌴", tagline:"The Golden State", incomeTax:{type:"brackets",brackets:[{min:0,max:10412,rate:1},{min:10412,max:24684,rate:2},{min:24684,max:38959,rate:4},{min:38959,max:54081,rate:6},{min:54081,max:68350,rate:8},{min:68350,max:349137,rate:9.3},{min:349137,max:418961,rate:10.3},{min:418961,max:698271,rate:11.3},{min:698271,max:null,rate:13.3}]}, salesTax:{state:7.25,avgLocal:1.57,combined:8.82}, propertyTax:{effective:0.71,note:"Limited by Prop 13"}, quirks:[{icon:"🔝",text:"Highest state income tax in the US at 13.3% for incomes over $1M."},{icon:"🏠",text:"Prop 13 caps property tax increases at 2%/year until the property is sold."},{icon:"🥗",text:"Groceries and prescription drugs are exempt from sales tax."}]},
+  CO: { name:"Colorado", emoji:"🏔️", tagline:"The Centennial State", incomeTax:{type:"flat",rate:4.4,note:"Flat rate — TABOR refunds may further reduce burden"}, salesTax:{state:2.9,avgLocal:4.87,combined:7.77}, propertyTax:{effective:0.52,note:"Low effective rate"}, quirks:[{icon:"❄️",text:"TABOR amendment limits state revenue — residents often receive annual tax refunds."},{icon:"🏠",text:"Senior citizens may qualify for property tax exemptions."},{icon:"🍃",text:"Colorado taxes recreational marijuana, generating hundreds of millions annually."}]},
+  CT: { name:"Connecticut", emoji:"⚓", tagline:"The Constitution State", incomeTax:{type:"brackets",brackets:[{min:0,max:10000,rate:3.0},{min:10000,max:50000,rate:5.0},{min:50000,max:100000,rate:5.5},{min:100000,max:200000,rate:6.0},{min:200000,max:250000,rate:6.5},{min:250000,max:500000,rate:6.9},{min:500000,max:null,rate:6.99}]}, salesTax:{state:6.35,avgLocal:0,combined:6.35}, propertyTax:{effective:1.79,note:"One of the highest in the US"}, quirks:[{icon:"🏚️",text:"Property taxes are among the highest in the nation."},{icon:"💼",text:"No local income taxes — only state-level."},{icon:"🎰",text:"Gambling winnings are fully taxable as income."}]},
+  DE: { name:"Delaware", emoji:"🦅", tagline:"The First State", incomeTax:{type:"brackets",brackets:[{min:0,max:2000,rate:0},{min:2000,max:5000,rate:2.2},{min:5000,max:10000,rate:3.9},{min:10000,max:20000,rate:4.8},{min:20000,max:25000,rate:5.2},{min:25000,max:60000,rate:5.55},{min:60000,max:null,rate:6.6}]}, salesTax:{state:0,avgLocal:0,combined:0}, propertyTax:{effective:0.54,note:"Low effective rate"}, quirks:[{icon:"🛍️",text:"No sales tax at all — a huge perk for shoppers and businesses."},{icon:"🏢",text:"Major incorporation hub — home to most Fortune 500 companies legally."},{icon:"👴",text:"Generous pension and retirement income exclusions for seniors."}]},
+  FL: { name:"Florida", emoji:"🌴", tagline:"The Sunshine State", incomeTax:{type:"none"}, salesTax:{state:6.0,avgLocal:1.08,combined:7.08}, propertyTax:{effective:0.80,note:"Homestead exemption available"}, quirks:[{icon:"☀️",text:"No state income tax — a major draw for retirees and high earners."},{icon:"🏠",text:"Homestead Exemption can reduce taxable home value by up to $50,000."},{icon:"🎪",text:"Amusement park admissions (like Disney) are subject to sales tax."}]},
+  GA: { name:"Georgia", emoji:"🍑", tagline:"The Peach State", incomeTax:{type:"flat",rate:5.19,note:"Accelerated to 5.19% flat rate in 2025; heading to 4.99%"}, salesTax:{state:4.0,avgLocal:3.35,combined:7.35}, propertyTax:{effective:0.86,note:"Homestead exemptions available"}, quirks:[{icon:"📉",text:"Accelerated transition to flat tax — now 5.19%, with plans to reach 4.99% by 2029."},{icon:"🎬",text:"Generous film tax credits make Georgia a major Hollywood production hub."},{icon:"🧃",text:"Groceries are exempt from state sales tax but subject to local taxes."}]},
+  HI: { name:"Hawaii", emoji:"🌺", tagline:"The Aloha State", incomeTax:{type:"brackets",brackets:[{min:0,max:2400,rate:1.4},{min:2400,max:4800,rate:3.2},{min:4800,max:9600,rate:5.5},{min:9600,max:14400,rate:6.4},{min:14400,max:19200,rate:6.8},{min:19200,max:24000,rate:7.2},{min:24000,max:36000,rate:7.6},{min:36000,max:48000,rate:7.9},{min:48000,max:150000,rate:8.25},{min:150000,max:175000,rate:9.0},{min:175000,max:200000,rate:10.0},{min:200000,max:null,rate:11.0}]}, salesTax:{state:4.0,avgLocal:0.44,combined:4.44,note:"Called General Excise Tax (GET)"}, propertyTax:{effective:0.27,note:"Lowest effective rate in the US"}, quirks:[{icon:"🏝️",text:"Lowest effective property tax rate in the entire US."},{icon:"💼",text:"The GET is applied at every stage of production — not just the final retail sale."},{icon:"🌋",text:"High cost of living means the real tax burden is very high despite moderate stated rates."}]},
+  ID: { name:"Idaho", emoji:"🥔", tagline:"The Gem State", incomeTax:{type:"flat",rate:5.3,note:"Reduced from 5.695% in 2025"}, salesTax:{state:6.0,avgLocal:0.03,combined:6.03}, propertyTax:{effective:0.69,note:"Below national average"}, quirks:[{icon:"📦",text:"Groceries are taxed at the full sales tax rate, but a grocery tax credit offsets this for residents."},{icon:"🌿",text:"No taxes on Social Security benefits."},{icon:"🏠",text:"Homeowner's exemption reduces assessed value of primary residences."}]},
+  IL: { name:"Illinois", emoji:"🌽", tagline:"The Prairie State", incomeTax:{type:"flat",rate:4.95,note:"Flat rate mandated by state constitution"}, salesTax:{state:6.25,avgLocal:2.49,combined:8.74}, propertyTax:{effective:2.08,note:"Second highest in the US"}, quirks:[{icon:"🏠",text:"Property taxes are the second highest in the nation — a major cost for homeowners."},{icon:"📜",text:"State constitution requires a flat income tax — graduated rates would require a constitutional amendment."},{icon:"💊",text:"Groceries are taxed at a reduced 1% rate; prescription drugs are exempt."}]},
+  IN: { name:"Indiana", emoji:"🏎️", tagline:"The Hoosier State", incomeTax:{type:"flat",rate:3.0,note:"Reduced from 3.05% in 2025"}, salesTax:{state:7.0,avgLocal:0,combined:7.0}, propertyTax:{effective:0.85,note:"Constitutionally capped at 1% for homesteads"}, quirks:[{icon:"📉",text:"Flat 3.0% income tax — one of the lowest flat rates in the country, and it's still being reduced."},{icon:"🏠",text:"Property taxes are constitutionally capped at 1% of assessed value for owner-occupied homes."},{icon:"🚗",text:"No local sales taxes — the state rate is uniform statewide."}]},
+  IA: { name:"Iowa", emoji:"🌾", tagline:"The Hawkeye State", incomeTax:{type:"flat",rate:3.8,note:"Transitioned to flat 3.8% in 2025 — further reductions planned"}, salesTax:{state:6.0,avgLocal:0.94,combined:6.94}, propertyTax:{effective:1.57,note:"Among the higher rates in the Midwest"}, quirks:[{icon:"📉",text:"Moved to a flat 3.8% in 2025, collapsing multiple brackets — a huge change for higher earners."},{icon:"👴",text:"Retirement income (including Social Security) is fully exempt from state income tax."},{icon:"🌽",text:"Machinery used in farming is generally exempt from sales tax."}]},
+  KS: { name:"Kansas", emoji:"🌻", tagline:"The Sunflower State", incomeTax:{type:"brackets",brackets:[{min:0,max:23000,rate:0},{min:23000,max:null,rate:5.58}]}, salesTax:{state:6.5,avgLocal:2.22,combined:8.72}, propertyTax:{effective:1.41,note:"Above national average"}, quirks:[{icon:"🥗",text:"Kansas eliminated its grocery sales tax — a significant saving for families."},{icon:"📉",text:"2024 reform consolidated brackets and dramatically raised the personal exemption."},{icon:"🏠",text:"Homestead property tax refund available for lower-income residents."}]},
+  KY: { name:"Kentucky", emoji:"🐴", tagline:"The Bluegrass State", incomeTax:{type:"flat",rate:4.0,note:"Rate being phased down toward elimination"}, salesTax:{state:6.0,avgLocal:0,combined:6.0}, propertyTax:{effective:0.86,note:"No local sales tax"}, quirks:[{icon:"🥃",text:"Kentucky bourbon is subject to a unique barrel tax while aging in warehouses."},{icon:"🎰",text:"Horse racing and gambling winnings are taxable income."},{icon:"📉",text:"Income tax rate is being phased down — lawmakers aim for eventual elimination."}]},
+  LA: { name:"Louisiana", emoji:"🎺", tagline:"The Pelican State", incomeTax:{type:"flat",rate:3.0,note:"New flat 3% rate effective Jan 1, 2025 — simplified from 3-bracket system"}, salesTax:{state:5.0,avgLocal:5.1,combined:10.1,note:"State rate restored to 5% in 2025; combined is highest in the US"}, propertyTax:{effective:0.56,note:"Low effective rate with homestead exemption"}, quirks:[{icon:"🔄",text:"Massive 2025 reform: income tax collapsed to flat 3%, but sales tax rate raised back to 5%."},{icon:"🏠",text:"Homestead exemption removes the first $75,000 of home value from property taxes."},{icon:"🎶",text:"No state taxes on food or prescription drugs purchased for home consumption."}]},
+  ME: { name:"Maine", emoji:"🦞", tagline:"The Pine Tree State", incomeTax:{type:"brackets",brackets:[{min:0,max:24500,rate:5.8},{min:24500,max:58050,rate:6.75},{min:58050,max:null,rate:7.15}]}, salesTax:{state:5.5,avgLocal:0,combined:5.5}, propertyTax:{effective:1.36,note:"Above national average"}, quirks:[{icon:"🦞",text:"No local sales taxes — the 5.5% rate is uniform statewide."},{icon:"🌲",text:"Maine has a unique tree growth tax program — forests are taxed at lower rates."},{icon:"👴",text:"Pension income from state/federal government is partially exempt."}]},
+  MD: { name:"Maryland", emoji:"🦀", tagline:"The Old Line State", incomeTax:{type:"brackets",brackets:[{min:0,max:1000,rate:2.0},{min:1000,max:2000,rate:3.0},{min:2000,max:3000,rate:4.0},{min:3000,max:100000,rate:4.75},{min:100000,max:125000,rate:5.0},{min:125000,max:150000,rate:5.25},{min:150000,max:250000,rate:5.5},{min:250000,max:null,rate:5.75}]}, salesTax:{state:6.0,avgLocal:0,combined:6.0}, propertyTax:{effective:1.05,note:"Homestead credit available"}, quirks:[{icon:"🏙️",text:"Counties also impose their own income taxes (1.75%–3.2%), meaningfully increasing the real burden."},{icon:"🦀",text:"No sales tax on groceries or prescription drugs."},{icon:"🎓",text:"Income tax credit available for college loan debt repayments."}]},
+  MA: { name:"Massachusetts", emoji:"🦃", tagline:"The Bay State", incomeTax:{type:"flat",rate:5.0,note:"Plus 4% surtax on income over $1M (Millionaire's Tax)"}, salesTax:{state:6.25,avgLocal:0,combined:6.25}, propertyTax:{effective:1.14,note:"Varies by municipality"}, quirks:[{icon:"💎",text:"A 4% surtax applies to income over $1 million — effective top rate of 9%."},{icon:"🛍️",text:"Clothing under $175 per item is exempt from sales tax."},{icon:"☕",text:"No tax on groceries, but restaurant meals are taxed at 6.25%."}]},
+  MI: { name:"Michigan", emoji:"🚗", tagline:"The Great Lakes State", incomeTax:{type:"flat",rate:4.25,note:"Flat rate; some cities add local tax"}, salesTax:{state:6.0,avgLocal:0,combined:6.0}, propertyTax:{effective:1.54,note:"Above national average"}, quirks:[{icon:"🏙️",text:"Detroit imposes its own city income tax (2.4% for residents, 1.2% for non-residents)."},{icon:"🥗",text:"Groceries and prescription drugs are exempt from sales tax."},{icon:"👴",text:"Retirement and pension income is being phased into a larger exemption through 2026."}]},
+  MN: { name:"Minnesota", emoji:"🌊", tagline:"The Land of 10,000 Lakes", incomeTax:{type:"brackets",brackets:[{min:0,max:31690,rate:5.35},{min:31690,max:104090,rate:6.8},{min:104090,max:193240,rate:7.85},{min:193240,max:null,rate:9.85}]}, salesTax:{state:6.875,avgLocal:0.58,combined:7.46}, propertyTax:{effective:1.12,note:"Homestead credit available"}, quirks:[{icon:"❄️",text:"One of the highest top income tax rates in the Midwest at 9.85%."},{icon:"👗",text:"Clothing is exempt from sales tax — a notable consumer benefit."},{icon:"🌽",text:"Groceries are generally exempt from sales tax."}]},
+  MS: { name:"Mississippi", emoji:"🎸", tagline:"The Magnolia State", incomeTax:{type:"flat",rate:4.4,note:"Reduced from 4.7% in 2025; heading to 4% by 2026"}, salesTax:{state:7.0,avgLocal:0.07,combined:7.07}, propertyTax:{effective:0.8,note:"Below national average"}, quirks:[{icon:"📉",text:"Income tax cut again to 4.4% in 2025, on a path toward further reductions."},{icon:"🛒",text:"Groceries are taxed at a reduced 7% — one of the few states that still taxes food."},{icon:"💊",text:"Prescription drugs are exempt from sales tax."}]},
+  MO: { name:"Missouri", emoji:"🌉", tagline:"The Show Me State", incomeTax:{type:"brackets",brackets:[{min:0,max:1313,rate:0},{min:1313,max:2626,rate:2.0},{min:2626,max:3939,rate:2.5},{min:3939,max:5252,rate:3.0},{min:5252,max:6565,rate:3.5},{min:6565,max:7878,rate:4.0},{min:7878,max:9191,rate:4.5},{min:9191,max:null,rate:4.7}]}, salesTax:{state:4.225,avgLocal:4.07,combined:8.29}, propertyTax:{effective:1.01,note:"Near national average"}, quirks:[{icon:"💹",text:"New for 2025: Missouri does NOT tax capital gains income — a major benefit for investors."},{icon:"🏙️",text:"Kansas City and St. Louis impose their own earnings taxes (1%) on top of state taxes."},{icon:"👴",text:"Social Security benefits are fully exempt from state income tax."}]},
+  MT: { name:"Montana", emoji:"🦌", tagline:"Big Sky Country", incomeTax:{type:"brackets",brackets:[{min:0,max:3600,rate:1.0},{min:3600,max:6300,rate:2.0},{min:6300,max:9700,rate:3.0},{min:9700,max:13000,rate:4.0},{min:13000,max:16800,rate:5.0},{min:16800,max:21600,rate:6.0},{min:21600,max:null,rate:6.75}]}, salesTax:{state:0,avgLocal:0,combined:0}, propertyTax:{effective:0.74,note:"No sales tax offsets income tax burden"}, quirks:[{icon:"🛍️",text:"No sales tax statewide — great for big purchases."},{icon:"🏕️",text:"Resort taxes are allowed in tourist towns like Whitefish and Big Sky."},{icon:"🚜",text:"Agricultural property is assessed at a lower mill rate."}]},
+  NE: { name:"Nebraska", emoji:"🌽", tagline:"The Cornhusker State", incomeTax:{type:"brackets",brackets:[{min:0,max:3700,rate:2.46},{min:3700,max:22170,rate:3.51},{min:22170,max:35730,rate:4.91},{min:35730,max:null,rate:5.2}]}, salesTax:{state:5.5,avgLocal:1.44,combined:6.94}, propertyTax:{effective:1.67,note:"Among the highest in the nation"}, quirks:[{icon:"📉",text:"Top income tax rate cut to 5.2% in 2025, down from 5.84% — continuing a multi-year reduction."},{icon:"🏠",text:"Property taxes remain among the highest in the Midwest — a major focus of legislative reform."},{icon:"🌽",text:"Ag land is assessed separately at a lower rate than residential property."}]},
+  NV: { name:"Nevada", emoji:"🎰", tagline:"The Silver State", incomeTax:{type:"none"}, salesTax:{state:6.85,avgLocal:1.38,combined:8.23}, propertyTax:{effective:0.55,note:"Below national average"}, quirks:[{icon:"🎰",text:"No state income tax — funded largely by gaming and tourism revenue."},{icon:"🛒",text:"Groceries are exempt from state sales tax, but counties can add their own food tax."},{icon:"🏠",text:"Property taxes are kept low by an abatement program that caps increases at 3%/year."}]},
+  NH: { name:"New Hampshire", emoji:"🍁", tagline:"The Granite State", incomeTax:{type:"none",note:"Interest & dividends tax fully repealed as of January 1, 2025"}, salesTax:{state:0,avgLocal:0,combined:0}, propertyTax:{effective:1.93,note:"Third highest in the US"}, quirks:[{icon:"🎉",text:"As of 2025, NH is officially a no-income-tax state — the I&D tax was fully repealed."},{icon:"🛍️",text:"No income tax and no sales tax — but property taxes are very high to compensate."},{icon:"🏠",text:"One of the highest property tax rates in the nation."}]},
+  NJ: { name:"New Jersey", emoji:"🌊", tagline:"The Garden State", incomeTax:{type:"brackets",brackets:[{min:0,max:20000,rate:1.4},{min:20000,max:35000,rate:1.75},{min:35000,max:40000,rate:3.5},{min:40000,max:75000,rate:5.525},{min:75000,max:500000,rate:6.37},{min:500000,max:1000000,rate:8.97},{min:1000000,max:null,rate:10.75}]}, salesTax:{state:6.625,avgLocal:-0.03,combined:6.6}, propertyTax:{effective:2.23,note:"Highest in the US"}, quirks:[{icon:"🏠",text:"Highest property taxes in the entire nation — averaging over $9,500/year."},{icon:"🧥",text:"Most clothing items are exempt from sales tax."},{icon:"🥗",text:"Groceries and prescription drugs are not subject to sales tax."}]},
+  NM: { name:"New Mexico", emoji:"🌶️", tagline:"The Land of Enchantment", incomeTax:{type:"brackets",brackets:[{min:0,max:5500,rate:1.7},{min:5500,max:11000,rate:3.2},{min:11000,max:16000,rate:4.7},{min:16000,max:210000,rate:4.9},{min:210000,max:null,rate:5.9}]}, salesTax:{state:5.0,avgLocal:2.72,combined:7.72}, propertyTax:{effective:0.67,note:"Below national average"}, quirks:[{icon:"🛢️",text:"Oil and gas revenues provide significant state funding, reducing individual tax burden."},{icon:"🌵",text:"Groceries are taxed but rebates available for low-income residents."},{icon:"👴",text:"Social Security income is exempt from state income tax for most residents."}]},
+  NY: { name:"New York", emoji:"🗽", tagline:"The Empire State", incomeTax:{type:"brackets",brackets:[{min:0,max:8500,rate:4.0},{min:8500,max:11700,rate:4.5},{min:11700,max:13900,rate:5.25},{min:13900,max:80650,rate:5.5},{min:80650,max:215400,rate:6.0},{min:215400,max:1077550,rate:6.85},{min:1077550,max:5000000,rate:9.65},{min:5000000,max:25000000,rate:10.3},{min:25000000,max:null,rate:10.9}]}, salesTax:{state:4.0,avgLocal:4.52,combined:8.52}, propertyTax:{effective:1.54,note:"NYC adds its own income and property taxes"}, quirks:[{icon:"🏙️",text:"NYC residents pay an additional city income tax of 3.078%–3.876% on top of state tax."},{icon:"🧁",text:"Bagels are taxed differently if sliced or with cream cheese — uniquely NY tax law."},{icon:"👗",text:"Clothing items under $110 each are exempt from state sales tax."}]},
+  NC: { name:"North Carolina", emoji:"🏀", tagline:"The Tar Heel State", incomeTax:{type:"flat",rate:4.25,note:"Reduced from 4.5% in 2025; phasing toward 3.99%"}, salesTax:{state:4.75,avgLocal:2.22,combined:6.97}, propertyTax:{effective:0.80,note:"Below national average"}, quirks:[{icon:"📉",text:"Income tax cut to 4.25% in 2025 — one of the most aggressively reducing states in the country."},{icon:"🛒",text:"Groceries are taxed at a reduced 2% state rate."},{icon:"💊",text:"Prescription drugs are fully exempt from sales tax."}]},
+  ND: { name:"North Dakota", emoji:"🌾", tagline:"The Peace Garden State", incomeTax:{type:"brackets",brackets:[{min:0,max:44725,rate:1.1},{min:44725,max:225975,rate:2.04},{min:225975,max:null,rate:2.9}]}, salesTax:{state:5.0,avgLocal:1.85,combined:6.85}, propertyTax:{effective:0.98,note:"Near national average"}, quirks:[{icon:"🛢️",text:"Oil production revenues help keep taxes low for residents."},{icon:"🏠",text:"Homestead credit available for elderly and disabled homeowners."},{icon:"🌾",text:"Agricultural machinery and equipment exempt from sales tax."}]},
+  OH: { name:"Ohio", emoji:"🌰", tagline:"The Buckeye State", incomeTax:{type:"brackets",brackets:[{min:0,max:26050,rate:0},{min:26050,max:100000,rate:2.765},{min:100000,max:115300,rate:3.226},{min:115300,max:null,rate:3.688}]}, salesTax:{state:5.75,avgLocal:1.48,combined:7.23}, propertyTax:{effective:1.62,note:"Above national average"}, quirks:[{icon:"🏙️",text:"Many Ohio cities impose their own municipal income taxes (0.5%–3%)."},{icon:"🥗",text:"Groceries and prescription drugs are exempt from sales tax."},{icon:"📉",text:"No income tax on the first $26,050 of income."}]},
+  OK: { name:"Oklahoma", emoji:"🌪️", tagline:"The Sooner State", incomeTax:{type:"brackets",brackets:[{min:0,max:1000,rate:0.25},{min:1000,max:2500,rate:0.75},{min:2500,max:3750,rate:1.75},{min:3750,max:4900,rate:2.75},{min:4900,max:7200,rate:3.75},{min:7200,max:null,rate:4.75}]}, salesTax:{state:4.5,avgLocal:4.47,combined:8.97}, propertyTax:{effective:0.90,note:"Below national average"}, quirks:[{icon:"⛽",text:"Oklahoma has a gross production tax on oil and gas — helps offset income taxes."},{icon:"🛒",text:"Groceries are taxed at the full rate, though credits exist for low-income filers."},{icon:"👴",text:"Social Security benefits are exempt from income tax."}]},
+  OR: { name:"Oregon", emoji:"🌲", tagline:"The Beaver State", incomeTax:{type:"brackets",brackets:[{min:0,max:4050,rate:4.75},{min:4050,max:10200,rate:6.75},{min:10200,max:125000,rate:8.75},{min:125000,max:null,rate:9.9}]}, salesTax:{state:0,avgLocal:0,combined:0}, propertyTax:{effective:0.93,note:"Measure 5 caps rates"}, quirks:[{icon:"🛍️",text:"No sales tax statewide — Oregon and a few others are outliers in the US."},{icon:"📈",text:"High income taxes compensate for the lack of sales tax revenue."},{icon:"🏙️",text:"Portland Metro area imposes its own income tax for supportive housing services."}]},
+  PA: { name:"Pennsylvania", emoji:"🔔", tagline:"The Keystone State", incomeTax:{type:"flat",rate:3.07,note:"One of the lowest flat rates in the US"}, salesTax:{state:6.0,avgLocal:0.34,combined:6.34}, propertyTax:{effective:1.58,note:"Above national average"}, quirks:[{icon:"🏙️",text:"Philadelphia imposes its own wage tax (3.79% for residents, 3.44% for non-residents)."},{icon:"👴",text:"Retirement income (pensions, 401(k), Social Security) is fully exempt from PA income tax."},{icon:"🥗",text:"Most food and clothing is exempt from PA sales tax."}]},
+  RI: { name:"Rhode Island", emoji:"⚓", tagline:"The Ocean State", incomeTax:{type:"brackets",brackets:[{min:0,max:73450,rate:3.75},{min:73450,max:166950,rate:4.75},{min:166950,max:null,rate:5.99}]}, salesTax:{state:7.0,avgLocal:0,combined:7.0}, propertyTax:{effective:1.53,note:"Above national average"}, quirks:[{icon:"🦞",text:"No local sales taxes — the statewide rate is uniform."},{icon:"🛒",text:"Most food for home consumption is exempt from the sales tax."},{icon:"🎰",text:"Rhode Island's state lottery and Twin River casinos generate significant revenue."}]},
+  SC: { name:"South Carolina", emoji:"🍑", tagline:"The Palmetto State", incomeTax:{type:"brackets",brackets:[{min:0,max:3460,rate:0},{min:3460,max:17330,rate:3.0},{min:17330,max:null,rate:6.2}]}, salesTax:{state:6.0,avgLocal:1.43,combined:7.43}, propertyTax:{effective:0.57,note:"Low effective rate; large homestead exemption"}, quirks:[{icon:"🏠",text:"Large homestead exemption for residents age 65+ — first $50,000 is exempt."},{icon:"📉",text:"Top income tax rate reduced to 6.2% in 2025, with further reductions planned."},{icon:"🌊",text:"Retirement income exclusion up to $10,000 for those 65 and older."}]},
+  SD: { name:"South Dakota", emoji:"🦬", tagline:"The Mount Rushmore State", incomeTax:{type:"none"}, salesTax:{state:4.2,avgLocal:1.9,combined:6.1}, propertyTax:{effective:1.14,note:"Near national average"}, quirks:[{icon:"💰",text:"No income tax — South Dakota is popular for trusts and business incorporation."},{icon:"🏛️",text:"No state estate or inheritance tax."},{icon:"🐄",text:"Agricultural land is assessed at lower rates to support farming communities."}]},
+  TN: { name:"Tennessee", emoji:"🎸", tagline:"The Volunteer State", incomeTax:{type:"none",note:"Hall income tax on dividends/interest was eliminated in 2021"}, salesTax:{state:7.0,avgLocal:2.55,combined:9.55,note:"Second highest combined in US"}, propertyTax:{effective:0.66,note:"Below national average"}, quirks:[{icon:"🎸",text:"No income tax — but sales taxes are among the highest in the country."},{icon:"🛒",text:"Groceries are taxed at a reduced 4% state rate (local taxes apply on top)."},{icon:"🏠",text:"Property taxes are quite low, especially compared to northeastern states."}]},
+  TX: { name:"Texas", emoji:"⭐", tagline:"The Lone Star State", incomeTax:{type:"none"}, salesTax:{state:6.25,avgLocal:1.95,combined:8.2}, propertyTax:{effective:1.74,note:"Among the highest in the US"}, quirks:[{icon:"💰",text:"No state income tax — but property taxes are very high to fund schools and local services."},{icon:"🏠",text:"Homestead exemption reduces taxable value; school district taxes are significant."},{icon:"🤠",text:"Texas has a franchise tax (gross receipts tax) on businesses instead of a corporate income tax."}]},
+  UT: { name:"Utah", emoji:"🏜️", tagline:"The Beehive State", incomeTax:{type:"flat",rate:4.5,note:"Reduced from 4.55% retroactively for 2025"}, salesTax:{state:6.1,avgLocal:1.09,combined:7.19}, propertyTax:{effective:0.56,note:"Below national average"}, quirks:[{icon:"⛷️",text:"Utah has one of the fastest-growing economies in the US with competitive tax rates."},{icon:"🥗",text:"Groceries are taxed at a reduced 3% rate (state portion only)."},{icon:"👶",text:"Dependent exemption credit is available per child, reducing tax burden for families."}]},
+  VT: { name:"Vermont", emoji:"🍁", tagline:"The Green Mountain State", incomeTax:{type:"brackets",brackets:[{min:0,max:45400,rate:3.35},{min:45400,max:110650,rate:6.6},{min:110650,max:229550,rate:7.6},{min:229550,max:null,rate:8.75}]}, salesTax:{state:6.0,avgLocal:0.18,combined:6.18}, propertyTax:{effective:1.90,note:"Second highest in New England"}, quirks:[{icon:"🏔️",text:"Property taxes are among the highest in the nation."},{icon:"🍺",text:"Vermont taxes meals and alcoholic beverages at 9%."},{icon:"🏠",text:"Vermont's education fund is largely funded through property taxes."}]},
+  VA: { name:"Virginia", emoji:"🦅", tagline:"The Old Dominion", incomeTax:{type:"brackets",brackets:[{min:0,max:3000,rate:2.0},{min:3000,max:5000,rate:3.0},{min:5000,max:17000,rate:5.0},{min:17000,max:null,rate:5.75}]}, salesTax:{state:5.3,avgLocal:0.35,combined:5.65,note:"NOVA and Hampton Roads add extra 0.7%"}, propertyTax:{effective:0.87,note:"Below national average"}, quirks:[{icon:"🏛️",text:"The DC suburbs (NOVA) have a higher combined sales tax rate of 6.0%."},{icon:"🥗",text:"Groceries are taxed at a reduced 1% state rate."},{icon:"👴",text:"Individuals 65+ can subtract up to $12,000 in retirement income."}]},
+  WA: { name:"Washington", emoji:"🌧️", tagline:"The Evergreen State", incomeTax:{type:"none",note:"A 7% capital gains tax applies on long-term gains over $262,000"}, salesTax:{state:6.5,avgLocal:2.72,combined:9.22}, propertyTax:{effective:0.94,note:"Near national average"}, quirks:[{icon:"💻",text:"No income tax, but a 7% capital gains tax on long-term gains over $262,000 (2025 threshold)."},{icon:"🛒",text:"Groceries are exempt from sales tax, but the combined rate is still high on other goods."},{icon:"⚖️",text:"Washington has a Business & Occupation (B&O) tax — a gross receipts tax on businesses."}]},
+  WV: { name:"West Virginia", emoji:"⛰️", tagline:"The Mountain State", incomeTax:{type:"brackets",brackets:[{min:0,max:10000,rate:2.36},{min:10000,max:25000,rate:3.15},{min:25000,max:40000,rate:3.54},{min:40000,max:60000,rate:4.72},{min:60000,max:null,rate:4.82}]}, salesTax:{state:6.0,avgLocal:0.39,combined:6.39}, propertyTax:{effective:0.57,note:"Low effective rate"}, quirks:[{icon:"📉",text:"Income tax cut significantly in 2025 — top rate down to 4.82% from 6.5% in prior years."},{icon:"🪨",text:"Coal severance tax generates significant state revenue."},{icon:"👴",text:"Social Security tax exemption expanding — now includes filers 55–64 with AGI under $75K."}]},
+  WI: { name:"Wisconsin", emoji:"🧀", tagline:"The Badger State", incomeTax:{type:"brackets",brackets:[{min:0,max:13810,rate:3.5},{min:13810,max:27630,rate:4.4},{min:27630,max:304170,rate:5.3},{min:304170,max:null,rate:7.65}]}, salesTax:{state:5.0,avgLocal:0.43,combined:5.43}, propertyTax:{effective:1.61,note:"Above national average"}, quirks:[{icon:"🧀",text:"Wisconsin is a major dairy state — farm equipment and inputs get tax exemptions."},{icon:"🏠",text:"Property taxes are high, particularly in Milwaukee and Madison areas."},{icon:"🛒",text:"Groceries are generally exempt from sales tax."}]},
+  WY: { name:"Wyoming", emoji:"🦬", tagline:"The Cowboy State", incomeTax:{type:"none"}, salesTax:{state:4.0,avgLocal:1.36,combined:5.36}, propertyTax:{effective:0.57,note:"Low effective rate"}, quirks:[{icon:"🛢️",text:"No income tax — funded significantly by mineral severance taxes (coal, oil, gas)."},{icon:"🏛️",text:"No corporate income tax and no estate tax."},{icon:"🤠",text:"One of the most tax-friendly states for businesses and high-net-worth individuals."}]},
+  DC: { name:"Washington D.C.", emoji:"🏛️", tagline:"The Nation's Capital", incomeTax:{type:"brackets",brackets:[{min:0,max:10000,rate:4.0},{min:10000,max:40000,rate:6.0},{min:40000,max:60000,rate:6.5},{min:60000,max:250000,rate:8.5},{min:250000,max:500000,rate:9.25},{min:500000,max:1000000,rate:9.75},{min:1000000,max:null,rate:10.75}]}, salesTax:{state:6.0,avgLocal:0,combined:6.0}, propertyTax:{effective:0.55,note:"Homestead deduction and senior citizen credits available"}, quirks:[{icon:"🏛️",text:"DC residents pay federal taxes but have no voting representation in Congress."},{icon:"🍽️",text:"Restaurant meals and alcohol are taxed at 10% — higher than the general sales tax."},{icon:"🏠",text:"Homestead deduction reduces the taxable value of owner-occupied homes by $84,000+."}]}
+};
+
+// ── 2025 Federal Tax Constants ────────────────────────────────
+const FEDERAL = {
+  single:   { deduction: 15750, brackets: [{min:0,max:11925,rate:.10},{min:11925,max:48475,rate:.12},{min:48475,max:103350,rate:.22},{min:103350,max:197300,rate:.24},{min:197300,max:250525,rate:.32},{min:250525,max:626350,rate:.35},{min:626350,max:Infinity,rate:.37}] },
+  mfj:      { deduction: 31500, brackets: [{min:0,max:23850,rate:.10},{min:23850,max:96950,rate:.12},{min:96950,max:206700,rate:.22},{min:206700,max:394600,rate:.24},{min:394600,max:501050,rate:.32},{min:501050,max:751600,rate:.35},{min:751600,max:Infinity,rate:.37}] },
+  hoh:      { deduction: 22500, brackets: [{min:0,max:17000,rate:.10},{min:17000,max:64850,rate:.12},{min:64850,max:103350,rate:.22},{min:103350,max:197300,rate:.24},{min:197300,max:250500,rate:.32},{min:250500,max:626350,rate:.35},{min:626350,max:Infinity,rate:.37}] }
+};
+
+// ── App State ─────────────────────────────────────────────────
+let currentState = null;
+let compareState = null;
+let filingStatus = 'single';
+let selectedLocalTax = 'none';
+
+// ── Populate dropdown ─────────────────────────────────────────
+const stateSelect = document.getElementById("stateSelect");
+const localTaxWrap = document.getElementById("localTaxWrap");
+const localTaxSelect = document.getElementById("localTaxSelect");
+const localTaxNote = document.getElementById("localTaxNote");
+const LOCAL_INCOME_TAX_OPTIONS = {
+  MD: {
+    note: "Maryland counties and Baltimore City levy their own local income taxes.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "montgomery", label: "Montgomery County", rate: 3.2 },
+      { value: "prince-georges", label: "Prince George's County", rate: 3.2 },
+      { value: "baltimore-city", label: "Baltimore City", rate: 3.2 },
+      { value: "howard", label: "Howard County", rate: 3.2 },
+      { value: "anne-arundel", label: "Anne Arundel County", rate: 2.81 },
+      { value: "statewide-low", label: "Lower-tax county example", rate: 2.25 }
+    ]
+  },
+  MI: {
+    note: "Michigan has city income taxes in a limited number of municipalities.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "detroit", label: "Detroit resident", rate: 2.4 },
+      { value: "grand-rapids", label: "Grand Rapids resident", rate: 1.5 },
+      { value: "lansing", label: "Lansing resident", rate: 1.0 },
+      { value: "flint", label: "Flint resident", rate: 1.0 }
+    ]
+  },
+  NY: {
+    note: "New York City and Yonkers add local income tax on top of state tax.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "nyc-lower", label: "New York City — lower bracket example", rate: 3.078 },
+      { value: "nyc-mid", label: "New York City — mid bracket example", rate: 3.762 },
+      { value: "nyc-top", label: "New York City — top bracket example", rate: 3.876 },
+      { value: "yonkers", label: "Yonkers resident surcharge", rate: 1.477 }
+    ]
+  },
+  OH: {
+    note: "Many Ohio municipalities levy their own income tax.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "columbus", label: "Columbus", rate: 2.5 },
+      { value: "cincinnati", label: "Cincinnati", rate: 1.8 },
+      { value: "cleveland", label: "Cleveland", rate: 2.5 },
+      { value: "toledo", label: "Toledo", rate: 2.25 },
+      { value: "low-example", label: "Low-tax city example", rate: 1.0 }
+    ]
+  },
+  PA: {
+    note: "Pennsylvania local earned-income and wage taxes vary widely by municipality.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "philadelphia-resident", label: "Philadelphia resident wage tax", rate: 3.79 },
+      { value: "pittsburgh-school", label: "Pittsburgh school district tax", rate: 2.0 },
+      { value: "typical-eit", label: "Typical local EIT example", rate: 1.0 }
+    ]
+  },
+  IN: {
+    note: "Indiana counties add local income tax on top of the flat state rate.",
+    options: [
+      { value: "none", label: "No local tax", rate: 0 },
+      { value: "marion", label: "Marion County", rate: 2.02 },
+      { value: "hamilton", label: "Hamilton County", rate: 1.1 },
+      { value: "lake", label: "Lake County", rate: 1.5 },
+      { value: "allen", label: "Allen County", rate: 1.48 }
+    ]
+  }
+};
+
+const incomeInput = document.getElementById("incomeInput");
+const monthlySpendInput = document.getElementById("monthlySpendInput");
+const homeValueInput = document.getElementById("homeValueInput");
+const compareMoveSelect = document.getElementById("compareMoveSelect");
+
+function getScenarioValues() {
+  return {
+    income: Math.max(0, Number(incomeInput.value) || 0),
+    monthlySpend: Math.max(0, Number(monthlySpendInput.value) || 0),
+    homeValue: Math.max(0, Number(homeValueInput.value) || 0)
+  };
+}
+
+function topRateForState(d) {
+  if (d.incomeTax.type === "none") return 0;
+  if (d.incomeTax.type === "flat") return d.incomeTax.rate;
+  return d.incomeTax.brackets[d.incomeTax.brackets.length - 1].rate;
+}
+
+function calcScenarioPackage(code, income = null, monthlySpend = null, homeValue = null) {
+  const d = TAX_DATA[code];
+  const scenario = getScenarioValues();
+  income = income ?? scenario.income;
+  monthlySpend = monthlySpend ?? scenario.monthlySpend;
+  homeValue = homeValue ?? scenario.homeValue;
+  const federal = calcFederalTax(income, filingStatus);
+  const fica = calcFICA(income);
+  const stateTax = calcStateTax(income, d.incomeTax, filingStatus);
+  const localTax = calcLocalTax(income, code);
+  const salesDrag = monthlySpend * 12 * (d.salesTax.combined / 100);
+  const propertyDrag = homeValue * (d.propertyTax.effective / 100);
+  const takehome = income - federal - fica - stateTax - localTax;
+  const totalDrag = federal + fica + stateTax + localTax + salesDrag + propertyDrag;
+  return { federal, fica, stateTax, localTax, salesDrag, propertyDrag, takehome, totalDrag };
+}
+
+function renderSnapshot() {
+  const snap = document.getElementById("snapshotGrid");
+  if (!currentState) {
+    snap.innerHTML = `
+      <div class="snapshot-row"><span>Selected state</span><strong>—</strong></div>
+      <div class="snapshot-row"><span>Estimated annual take-home</span><strong>—</strong></div>
+      <div class="snapshot-row"><span>Move-vs-stay difference</span><strong>—</strong></div>
+      <div class="snapshot-row"><span>Estimated annual tax drag</span><strong>—</strong></div>`;
+    return;
+  }
+  const pack = calcScenarioPackage(currentState);
+  const moveCode = compareMoveSelect.value && compareMoveSelect.value !== currentState ? compareMoveSelect.value : null;
+  const movePack = moveCode ? calcScenarioPackage(moveCode) : null;
+  const moveText = movePack ? `${movePack.takehome > pack.takehome ? 'Gain' : 'Lose'} ${fmt(Math.abs(movePack.takehome - pack.takehome))} / yr vs ${TAX_DATA[moveCode].name}` : 'No move comparison selected';
+  snap.innerHTML = `
+    <div class="snapshot-row"><span>Selected state</span><strong>${TAX_DATA[currentState].name}</strong></div>
+    <div class="snapshot-row"><span>Estimated annual take-home</span><strong>${fmt(pack.takehome)}</strong></div>
+    <div class="snapshot-row"><span>Move-vs-stay difference</span><strong>${moveText}</strong></div>
+    <div class="snapshot-row"><span>Estimated annual tax drag</span><strong>${fmt(pack.totalDrag)}</strong></div>`;
+}
+
+function renderProScore() {
+  if (!currentState) return;
+  const scenario = getScenarioValues();
+  const pack = calcScenarioPackage(currentState);
+  const moveCode = compareMoveSelect.value && compareMoveSelect.value !== currentState ? compareMoveSelect.value : null;
+  const movePack = moveCode ? calcScenarioPackage(moveCode) : null;
+  document.getElementById("headlineTakehome").textContent = fmt(pack.takehome);
+  document.getElementById("headlineSub").textContent = movePack
+    ? `At ${fmt(scenario.income)} income, moving to ${TAX_DATA[moveCode].name} changes annual take-home by ${fmt(movePack.takehome - pack.takehome)}.`
+    : `At ${fmt(scenario.income)} income, your estimated annual take-home in ${TAX_DATA[currentState].name} is ${fmt(pack.takehome)} before spending and housing.`;
+  document.getElementById("metricGrid").innerHTML = `
+    <div class="metric"><strong>${fmt(pack.takehome / 12)}</strong><span>Monthly take-home</span></div>
+    <div class="metric"><strong>${fmt(pack.takehome / 26)}</strong><span>Biweekly</span></div>
+    <div class="metric"><strong>${fmt(pack.salesDrag + pack.propertyDrag)}</strong><span>Sales + property drag</span></div>
+    <div class="metric"><strong>${((pack.totalDrag / Math.max(1, scenario.income)) * 100).toFixed(1)}%</strong><span>Total annual drag</span></div>`;
+}
+
+function renderLeaderboard() {
+  const scenario = getScenarioValues();
+  const ranked = stateOrder.map(code => ({ code, takehome: calcScenarioPackage(code, scenario.income, 0, 0).takehome }))
+    .sort((a, b) => b.takehome - a.takehome)
+    .slice(0, 3);
+  document.getElementById("leaderboardList").innerHTML = ranked.map((item, index) => `
+    <div class="leaderboard-row">
+      <div class="leaderboard-rank">${index + 1}</div>
+      <div><b>${TAX_DATA[item.code].name}</b><small>Take-home on ${fmt(scenario.income)} income</small></div>
+      <strong>${fmt(item.takehome)}</strong>
+    </div>`).join("");
+}
+
+function saveScenario() {
+  const saveStatus = document.getElementById("saveStatus");
+  if (!currentState) {
+    saveStatus.innerHTML = `Pick a <b>state</b> first, then save your scenario.`;
+    stateSelect.focus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  const payload = { currentState, filingStatus, selectedLocalTax, compareMove: compareMoveSelect.value || "", ...getScenarioValues(), savedAt: new Date().toLocaleString() };
+  try {
+    localStorage.setItem("taxmap-pro-scenario", JSON.stringify(payload));
+    saveStatus.innerHTML = `Saved <b>${TAX_DATA[currentState].name}</b> scenario on ${payload.savedAt}.`;
+  } catch (err) {
+    console.error(err);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `taxmap-pro-scenario-${currentState.toLowerCase()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    saveStatus.innerHTML = `Browser storage was unavailable, so a <b>backup file</b> was downloaded instead.`;
+  }
+}
+
+function loadScenario() {
+  try {
+    const raw = localStorage.getItem("taxmap-pro-scenario");
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.income != null) incomeInput.value = saved.income;
+    if (saved.monthlySpend != null) monthlySpendInput.value = saved.monthlySpend;
+    if (saved.homeValue != null) homeValueInput.value = saved.homeValue;
+    if (saved.compareMove) compareMoveSelect.value = saved.compareMove;
+    if (saved.filingStatus) filingStatus = saved.filingStatus;
+    if (saved.selectedLocalTax) selectedLocalTax = saved.selectedLocalTax;
+    document.querySelectorAll(".filing-toggle button").forEach(btn => btn.classList.toggle("active", btn.dataset.status === filingStatus));
+    if (saved.currentState && TAX_DATA[saved.currentState]) {
+      currentState = saved.currentState;
+      stateSelect.value = saved.currentState;
+    }
+    document.getElementById("saveStatus").innerHTML = `Loaded saved scenario from <b>${saved.savedAt || 'an earlier session'}</b>.`;
+  } catch (err) { console.error(err); }
+}
+
+function exportScenarioReport() {
+  if (!currentState) return;
+  const scenario = getScenarioValues();
+  const pack = calcScenarioPackage(currentState);
+  const moveCode = compareMoveSelect.value && compareMoveSelect.value !== currentState ? compareMoveSelect.value : null;
+  const moveText = moveCode ? (() => { const diff = calcScenarioPackage(moveCode).takehome - pack.takehome; return `${TAX_DATA[moveCode].name}: ${diff >= 0 ? '+' : '-'}${fmt(Math.abs(diff))} take-home vs current selection`; })() : "No move comparison selected";
+  const report = [
+    "TaxMap Pro Report",
+    `State: ${TAX_DATA[currentState].name}`,
+    `Filing status: ${filingStatus}`,
+    `Annual income: ${fmt(scenario.income)}`,
+    `Monthly taxable spending: ${fmt(scenario.monthlySpend)}`,
+    `Home value: ${fmt(scenario.homeValue)}`,
+    `Annual take-home: ${fmt(pack.takehome)}`,
+    `Monthly take-home: ${fmt(pack.takehome / 12)}`,
+    `Federal tax: ${fmt(pack.federal)}`,
+    `FICA: ${fmt(pack.fica)}`,
+    `State tax: ${fmt(pack.stateTax)}`,
+    `Local tax: ${fmt(pack.localTax)}`,
+    `Estimated sales tax drag: ${fmt(pack.salesDrag)}`,
+    `Estimated property tax drag: ${fmt(pack.propertyDrag)}`,
+    `Estimated annual drag: ${fmt(pack.totalDrag)}`,
+    `Move comparison: ${moveText}`
+  ].join("\n");
+  const blob = new Blob([report], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `taxmap-pro-${currentState.toLowerCase()}-report.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function updateProUI() {
+  renderSnapshot();
+  if (currentState) {
+    renderProScore();
+    renderLeaderboard();
+  }
+}
+
+const stateOrder = Object.keys(TAX_DATA).sort((a,b) => TAX_DATA[a].name.localeCompare(TAX_DATA[b].name));
+stateOrder.forEach(code => {
+  const opt = document.createElement("option");
+  opt.value = code;
+  opt.textContent = `${TAX_DATA[code].emoji}  ${TAX_DATA[code].name}`;
+  stateSelect.appendChild(opt);
+  const moveOpt = document.createElement("option");
+  moveOpt.value = code;
+  moveOpt.textContent = `${TAX_DATA[code].emoji}  ${TAX_DATA[code].name}`;
+  compareMoveSelect.appendChild(moveOpt);
+});
+
+// Populate compare selects
+['compareSelectA','compareSelectB'].forEach(id => {
+  const sel = document.getElementById(id);
+  stateOrder.forEach(code => {
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = `${TAX_DATA[code].emoji}  ${TAX_DATA[code].name}`;
+    sel.appendChild(opt);
+  });
+});
+
+// ── Event listeners ───────────────────────────────────────────
+stateSelect.addEventListener("change", () => {
+  const code = stateSelect.value;
+  if (!code) { document.getElementById("taxContent").classList.add("hidden"); document.getElementById("placeholder").classList.remove("hidden"); currentState = null; updateProUI(); return; }
+  currentState = code;
+  renderState(code);
+});
+
+document.querySelectorAll(".filing-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filing-toggle button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    filingStatus = btn.dataset.status;
+    if (currentState) { renderExamples(TAX_DATA[currentState]); updateProUI(); }
+    if (compareState && currentState) renderCompareTable(currentState, compareState);
+  });
+});
+
+localTaxSelect.addEventListener("change", () => {
+  selectedLocalTax = localTaxSelect.value || 'none';
+  if (currentState) { renderExamples(TAX_DATA[currentState]); renderOtherTax(TAX_DATA[currentState]); updateProUI(); }
+  if (compareState && currentState) renderCompareTable(currentState, compareState);
+});
+
+// ── Compare button: always opens modal immediately, pre-filled with current state ──
+document.getElementById("addCompareBtn").addEventListener("click", () => {
+  openCompareModal(currentState, compareState);
+});
+
+document.getElementById("clearCompare").addEventListener("click", () => {
+  compareState = null;
+  document.getElementById("compareBanner").classList.add("hidden");
+});
+
+document.getElementById("viewCompareFull").addEventListener("click", () => {
+  openCompareModal(
+    document.getElementById("compareSelectA").value || currentState,
+    document.getElementById("compareSelectB").value || compareState
+  );
+});
+
+document.getElementById("closeModal").addEventListener("click", closeCompareModal);
+
+document.getElementById("compareModal").addEventListener("click", e => {
+  if (e.target === document.getElementById("compareModal")) closeCompareModal();
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeCompareModal();
+});
+
+['compareSelectA','compareSelectB'].forEach(id => {
+  document.getElementById(id).addEventListener("change", () => {
+    const a = document.getElementById("compareSelectA").value;
+    const b = document.getElementById("compareSelectB").value;
+    if (a && b && a !== b) {
+      renderCompareTable(a, b);
+      document.getElementById("compareMsg").classList.add("hidden");
+    } else if (a === b) {
+      document.getElementById("compareMsg").textContent = "Please select two different states.";
+      document.getElementById("compareMsg").classList.remove("hidden");
+    }
+  });
+});
+
+// ── Tax helpers ───────────────────────────────────────────────
+function getLocalTaxConfig(stateCode) {
+  return LOCAL_INCOME_TAX_OPTIONS[stateCode] || null;
+}
+
+function getSelectedLocalTaxOption(stateCode) {
+  const config = getLocalTaxConfig(stateCode);
+  if (!config) return null;
+  return config.options.find(option => option.value === selectedLocalTax) || config.options[0];
+}
+
+function calcLocalTax(gross, stateCode) {
+  const option = getSelectedLocalTaxOption(stateCode);
+  if (!option) return 0;
+  return gross * (option.rate / 100);
+}
+
+function renderLocalTaxControls(stateCode) {
+  const config = getLocalTaxConfig(stateCode);
+  if (!config) {
+    selectedLocalTax = "none";
+    localTaxWrap.classList.add("hidden");
+    localTaxSelect.innerHTML = "";
+    localTaxNote.textContent = "";
+    return;
+  }
+
+  if (!config.options.some(option => option.value === selectedLocalTax)) {
+    selectedLocalTax = config.options[0].value;
+  }
+
+  localTaxSelect.innerHTML = config.options.map(option => `<option value="${option.value}">${option.label}${option.rate ? ` (${fmtPct(option.rate)})` : ""}</option>`).join("");
+  localTaxSelect.value = selectedLocalTax;
+  localTaxNote.textContent = config.note;
+  localTaxWrap.classList.remove("hidden");
+}
+
+function calcStateTax(gross, it, status) {
+  if (it.type === "none") return 0;
+  const deduction = FEDERAL[status].deduction;
+  const taxable = Math.max(0, gross - deduction);
+  if (it.type === "flat") return taxable * (it.rate / 100);
+  let tax = 0;
+  for (const b of it.brackets) {
+    if (taxable <= b.min) break;
+    const upper = b.max !== null ? b.max : Infinity;
+    tax += (Math.min(taxable, upper) - b.min) * (b.rate / 100);
+  }
+  return tax;
+}
+
+function calcFederalTax(gross, status) {
+  const { deduction, brackets } = FEDERAL[status];
+  const taxable = Math.max(0, gross - deduction);
+  let tax = 0;
+  for (const b of brackets) {
+    if (taxable <= b.min) break;
+    tax += (Math.min(taxable, b.max) - b.min) * b.rate;
+  }
+  return tax;
+}
+
+function calcFICA(gross) {
+  return Math.min(gross, 176100) * 0.062 + gross * 0.0145; // 2025 SS wage base $176,100
+}
+
+function fmt(n) { return "$" + Math.round(n).toLocaleString(); }
+function fmtPct(n) { return n.toFixed(1) + "%"; }
+
+// ── Render state ──────────────────────────────────────────────
+function renderState(code) {
+  const d = TAX_DATA[code];
+  document.getElementById("stateEmoji").textContent = d.emoji;
+  document.getElementById("stateName").textContent = d.name;
+  document.getElementById("stateTagline").textContent = d.tagline;
+  renderLocalTaxControls(code);
+  renderQuickStats(d);
+  renderIncomeTax(d);
+  renderExamples(d);
+  renderOtherTax(d);
+  renderQuirks(d);
+  updateProUI();
+  document.getElementById("placeholder").classList.add("hidden");
+  const content = document.getElementById("taxContent");
+  content.classList.remove("hidden");
+  content.querySelectorAll(".card").forEach(c => { c.style.animation = "none"; requestAnimationFrame(() => { c.style.animation = ""; }); });
+}
+
+function renderQuickStats(d) {
+  let val, label;
+  if (d.incomeTax.type === "none") { val = "0%"; label = "Income Tax"; }
+  else if (d.incomeTax.type === "flat") { val = fmtPct(d.incomeTax.rate); label = "Flat Rate"; }
+  else { val = fmtPct(topRateForState(d)); label = "Top Rate"; }
+  document.getElementById("quickStats").innerHTML = `
+    <div class="quick-stat"><div class="quick-stat-value">${val}</div><div class="quick-stat-label">${label}</div></div>
+    <div class="quick-stat"><div class="quick-stat-value">${fmtPct(d.salesTax.combined)}</div><div class="quick-stat-label">Sales Tax</div></div>
+    <div class="quick-stat"><div class="quick-stat-value">${fmtPct(d.propertyTax.effective)}</div><div class="quick-stat-label">Prop. Tax</div></div>`;
+}
+
+function renderIncomeTax(d) {
+  const it = d.incomeTax; let html = "";
+  if (it.type === "none") {
+    html = `<span class="tax-type-badge badge--none">No Income Tax</span><p class="no-tax-message">${d.name} does not levy a state income tax.<br>One of only 9 states with this distinction.</p>${it.note?`<p style="margin-top:.75rem;font-size:.8rem;color:var(--ink-faint);font-style:italic">${it.note}</p>`:""}`;
+  } else if (it.type === "flat") {
+    html = `<span class="tax-type-badge badge--flat">Flat Rate</span><div class="flat-rate">${fmtPct(it.rate)}</div><p class="flat-desc">Applied to all taxable income equally.</p>${it.note?`<p style="margin-top:.5rem;font-size:.8rem;color:var(--ink-faint);font-style:italic">${it.note}</p>`:""}`;
+  } else {
+    const rows = it.brackets.map(b=>`<tr><td>${fmt(b.min)} – ${b.max!==null?fmt(b.max):"and up"}</td><td>${fmtPct(b.rate)}</td></tr>`).join("");
+    html = `<span class="tax-type-badge badge--brackets">Progressive Brackets</span><table class="brackets-table"><thead><tr><th>Income Range</th><th>Rate</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  document.getElementById("incomeTaxContent").innerHTML = html;
+}
+
+function renderExamples(d) {
+  const incomes = [40000, 75000, 120000, 200000];
+  const localOption = getSelectedLocalTaxOption(currentState);
+  const rows = incomes.map(income => {
+    const st = calcStateTax(income, d.incomeTax, filingStatus);
+    const fed = calcFederalTax(income, filingStatus);
+    const fica = calcFICA(income);
+    const local = calcLocalTax(income, currentState);
+    const th = income - st - fed - fica - local;
+    const pct = (th / income) * 100;
+    return `<div class="example-row"><div class="example-income">${fmt(income)}</div><div class="example-bar-wrap"><div class="example-bar" style="width:${Math.round(pct)}%"></div></div><div class="example-takehome">${fmt(th)}</div><div class="example-pct">${fmtPct(pct)}</div></div>`;
+  }).join("");
+  const localNote = localOption && localOption.rate
+    ? ` Includes local income tax: ${localOption.label}.`
+    : ` No city / local income tax selected.`;
+  document.getElementById("examplesContent").innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:.25rem"><span>Gross Income</span><span>Take-home</span></div>
+    ${rows}
+    <p class="example-note">Includes 2025 federal tax, FICA (7.65%), and state income tax using ${filingStatus==='mfj'?'married filing jointly':filingStatus==='hoh'?'head of household':'single'} standard deduction.${localNote}</p>`;
+}
+
+function renderOtherTax(d) {
+  const s = d.salesTax, p = d.propertyTax;
+  const scenario = getScenarioValues();
+  const estSales = scenario.monthlySpend * 12 * (s.combined / 100);
+  const estProperty = scenario.homeValue * (p.effective / 100);
+  document.getElementById("otherTaxContent").innerHTML = `
+    <div class="tax-row"><div class="tax-row-label"><strong>State Sales Tax</strong>Base rate set by the state</div><div class="tax-row-value">${fmtPct(s.state)}</div></div>
+    <div class="tax-row"><div class="tax-row-label"><strong>Avg. Local Sales Tax</strong>County / city additions</div><div class="tax-row-value">${fmtPct(s.avgLocal)}</div></div>
+    <div class="tax-row"><div class="tax-row-label"><strong>Combined Sales Tax</strong>${s.note||"State + average local rate"}</div><div class="tax-row-value">${fmtPct(s.combined)}</div></div>
+    <div class="tax-row"><div class="tax-row-label"><strong>Estimated Sales Tax Drag</strong>Based on ${fmt(scenario.monthlySpend)} monthly taxable spending</div><div class="tax-row-value">${fmt(estSales)} / yr</div></div>
+    <div class="tax-row"><div class="tax-row-label"><strong>Effective Property Tax</strong>${p.note}</div><div class="tax-row-value">${fmtPct(p.effective)}</div></div>
+    <div class="tax-row"><div class="tax-row-label"><strong>Estimated Property Tax Cost</strong>Based on ${fmt(scenario.homeValue)} home value</div><div class="tax-row-value">${fmt(estProperty)} / yr</div></div>`;
+}
+
+function renderQuirks(d) {
+  document.getElementById("quirksContent").innerHTML = d.quirks.map(q=>`<div class="quirk-item"><span class="quirk-icon">${q.icon}</span><p class="quirk-text">${q.text}</p></div>`).join("");
+}
+
+// ── Compare functions ─────────────────────────────────────────
+function closeCompareModal() {
+  document.getElementById("compareModal").classList.add("hidden");
+}
+
+function showCompareBanner(a, b) {
+  if (!a || !b || !TAX_DATA[a] || !TAX_DATA[b]) return;
+  document.getElementById("compareStateA").textContent = TAX_DATA[a].name;
+  document.getElementById("compareStateB").textContent = TAX_DATA[b].name;
+  document.getElementById("compareBanner").classList.remove("hidden");
+}
+
+function openCompareModal(stateA, stateB) {
+  const modal = document.getElementById("compareModal");
+  modal.classList.remove("hidden");
+
+  const selA = document.getElementById("compareSelectA");
+  const selB = document.getElementById("compareSelectB");
+
+  // Pre-fill: current state in A, previously compared state (or different default) in B
+  selA.value = stateA || stateOrder[0];
+  const fallbackB = stateOrder.find(s => s !== selA.value);
+  selB.value = (stateB && stateB !== selA.value) ? stateB : fallbackB;
+
+  document.getElementById("compareMsg").classList.add("hidden");
+
+  if (selA.value && selB.value && selA.value !== selB.value) {
+    renderCompareTable(selA.value, selB.value);
+  }
+}
+
+function renderCompareTable(codeA, codeB) {
+  const a = TAX_DATA[codeA], b = TAX_DATA[codeB];
+  if (!a || !b) return;
+  const incomes = [40000, 75000, 120000, 200000];
+
+  // Save as last compare and update banner
+  compareState = codeB;
+  showCompareBanner(codeA, codeB);
+
+  function topRate(d) {
+    if (d.incomeTax.type === "none") return 0;
+    if (d.incomeTax.type === "flat") return d.incomeTax.rate;
+    return d.incomeTax.brackets[d.incomeTax.brackets.length-1].rate;
+  }
+
+  function takehome(d, income, code) {
+    return income - calcStateTax(income, d.incomeTax, filingStatus) - calcFederalTax(income, filingStatus) - calcFICA(income) - calcLocalTax(income, code);
+  }
+
+  function winner(va, vb, lowerIsBetter = true) {
+    if (Math.abs(va - vb) < 0.001) return ['',''];
+    if (lowerIsBetter) return va < vb ? ['compare-winner','compare-loser'] : ['compare-loser','compare-winner'];
+    return va > vb ? ['compare-winner','compare-loser'] : ['compare-loser','compare-winner'];
+  }
+
+  const trA = topRate(a), trB = topRate(b);
+  const [wTA, wTB] = winner(trA, trB);
+  const [wSA, wSB] = winner(a.salesTax.combined, b.salesTax.combined);
+  const [wPA, wPB] = winner(a.propertyTax.effective, b.propertyTax.effective);
+
+  const incomeRows = incomes.map(inc => {
+    const thA = takehome(a, inc, codeA), thB = takehome(b, inc, codeB);
+    const diff = Math.abs(thA - thB);
+    const [wA, wB] = winner(thA, thB, false);
+    const diffStr = diff > 0 ? ` <span style="font-size:.7rem;color:var(--ink-faint)">(${fmt(diff)} diff)</span>` : '';
+    return `<tr>
+      <td>Take-home on ${fmt(inc)}</td>
+      <td class="${wA}">${fmt(thA)}</td>
+      <td class="${wB}">${fmt(thB)}${wB === 'compare-winner' ? diffStr : ''}</td>
+    </tr>`;
+  }).join("");
+
+  const rateDisplay = d => {
+    if (d.incomeTax.type === "none") return '<span style="color:var(--accent2);font-weight:600">None</span>';
+    if (d.incomeTax.type === "flat") return `${fmtPct(d.incomeTax.rate)} flat`;
+    return `Up to ${fmtPct(topRate(d))}`;
+  };
+
+  const noTaxNote = d => d.incomeTax.type === "none"
+    ? `<span style="font-size:.7rem;color:var(--ink-faint);display:block">0.0%</span>` : '';
+
+  document.getElementById("compareTableWrap").innerHTML = `
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>${a.emoji} ${a.name}</th>
+          <th>${b.emoji} ${b.name}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Income Tax Type</td><td>${rateDisplay(a)}</td><td>${rateDisplay(b)}</td></tr>
+        <tr>
+          <td>Top State Income Tax</td>
+          <td class="${wTA}">${fmtPct(trA)}${noTaxNote(a)}</td>
+          <td class="${wTB}">${fmtPct(trB)}${noTaxNote(b)}</td>
+        </tr>
+        ${incomeRows}
+        <tr><td>Combined Sales Tax</td><td class="${wSA}">${fmtPct(a.salesTax.combined)}</td><td class="${wSB}">${fmtPct(b.salesTax.combined)}</td></tr>
+        <tr><td>Effective Property Tax</td><td class="${wPA}">${fmtPct(a.propertyTax.effective)}</td><td class="${wPB}">${fmtPct(b.propertyTax.effective)}</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.7rem;color:var(--ink-faint);margin-top:1rem;font-style:italic;font-family:var(--mono)">
+      🟢 Green = lower tax burden / higher take-home &nbsp;·&nbsp; 🔴 Red = higher burden &nbsp;·&nbsp; Filing status: ${filingStatus === 'mfj' ? 'Married Filing Jointly' : filingStatus === 'hoh' ? 'Head of Household' : 'Single'} &nbsp;·&nbsp; Local tax selection applies when available
+    </p>`;
+}
+
+
+incomeInput.addEventListener("input", updateProUI);
+monthlySpendInput.addEventListener("input", () => { if (currentState) renderOtherTax(TAX_DATA[currentState]); updateProUI(); });
+homeValueInput.addEventListener("input", () => { if (currentState) renderOtherTax(TAX_DATA[currentState]); updateProUI(); });
+compareMoveSelect.addEventListener("change", updateProUI);
+document.getElementById("saveScenarioBtn").addEventListener("click", saveScenario);
+document.getElementById("exportReportBtn").addEventListener("click", exportScenarioReport);
+document.getElementById("recalcBtn").addEventListener("click", () => { if (currentState) renderState(currentState); else updateProUI(); });
+document.getElementById("resetScenarioBtn").addEventListener("click", () => { incomeInput.value = 85000; monthlySpendInput.value = 1800; homeValueInput.value = 450000; compareMoveSelect.value = ""; updateProUI(); if (currentState) renderState(currentState); });
+loadScenario();
+if (currentState) renderState(currentState); else updateProUI();
+
+</script>
+</body>
+</html>
